@@ -82,7 +82,7 @@ window.Bootsy.options = {
         check_attributes: {
           "width": "numbers",
           "height": "numbers",
-          "src": "href"
+          "src": "src"
         }
       }
     }
