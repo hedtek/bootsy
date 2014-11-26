@@ -29,17 +29,6 @@ window.Bootsy.options = {
     },
 
     tags: {
-      "iframe": {
-        set_attributes: {
-          "frameborder": "0",
-          "allowfullscreen": "1"
-        },
-        check_attributes: {
-          "width": "numbers",
-          "height": "numbers",
-          "src": "src"
-        }
-      },
       "b":  {},
       "i":  {},
       "br": {},
