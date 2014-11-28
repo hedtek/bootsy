@@ -72,14 +72,13 @@ window.Bootsy.options = {
       "div": 1,
       // to allow save and edit files with code tag hacks
       "code": 1,
-      "pre": 1
-    },
-
-    "iframe": {
-      check_attributes: {
-        src: "url",
-        width: "numbers",
-        height: "numbers"
+      "pre": 1,
+      "iframe": {
+        check_attributes: {
+          src: "url",
+          width: "numbers",
+          height: "numbers"
+        }
       }
     }
   },
