@@ -108,7 +108,7 @@
                   "</div>" +
                 "</div>" +
               "</div>" +
-              "<a class='btn btn-default " + size + "' data-wysihtml5-command='insertvideo' title='" + locale.video.insert + "' tabindex='-1'><i class='glyphicon glyphicon-picture'></i></a>" +
+              "<a class='btn btn-default " + size + "' data-wysihtml5-command='insertVideo' title='" + locale.video.insert + "' tabindex='-1'><i class='glyphicon glyphicon-film'></i></a>" +
             "</li>";
         },
 
