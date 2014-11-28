@@ -7323,8 +7323,56 @@ wysihtml5.commands.bold = {
 (function(wysihtml5) {
   var NODE_NAME = "IFRAME";
   wysihtml5.commands.insertVideo = {
+    getQueryParameters : function(str) {
+      return str.replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+    },
+
+    srcUrlType: function(url) {
+      var parser = document.createElement('a');
+      parser.href = url;
+      if(parser.hostname.match(/youtube\.com$/)) {
+        return "youtube";
+      } else if (parser.hostname.match(/youtu\.be/)) {
+        return "youtube";
+      } else if (parser.hostname.match(/vimeo\.com/)) {
+        return "vimeo";
+      }
+    },
+
+    prepareYoutubeUrl: function(url) {
+      var parser = document.createElement('a');
+      parser.href = url;
+      if (parser.hostname.match(/youtu\.be/)) {
+        return "//youtube.com/embed/" + parser.hostname.pathname
+      } else {
+        var params = this.getQueryParameters(parser.search);
+        return "//youtube.com/embed/" + params.v;
+      }
+    },
+
+    prepareVimeoUrl: function(url) {
+      return url;
+    },
+
     exec: function(composer, command, value) {
-      value = typeof(value) === "object" ? value : { href: value }
+      value = typeof(value) === "object" ? value : { src: value }
+
+      value.allowfullscreen = true;
+      value.frameborder = "0";
+      value.width = "853";
+      value.height = "480";
+
+      var srcUrlType = this.srcUrlType(value.src);
+
+      if(srcUrlType === "youtube") {
+        value.src = this.prepareYoutubeUrl(value.src)
+      } else if (srcUrlType == "vimeo") {
+        value.src = this.prepareVimeoUrl(value.src)
+      } else {
+        return;
+      }
+
+      //
       //TODO still need to make sure value is sensible for the video
       //
       // 1. Make sure value is a url
