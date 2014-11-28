@@ -88,6 +88,30 @@
             "</li>";
         },
 
+        "video": function(locale, options) {
+            var size = (options && options.size) ? ' btn-'+options.size : '';
+            return "<li>" +
+              "<div class='bootstrap-wysihtml5-insert-video-modal modal fade' tabindex='-1' role='dialog' aria-hidden='true'>" +
+                "<div class='modal-dialog'>" +
+                  "<div class='modal-content'>" +
+                    "<div class='modal-header'>" +
+                      "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>" +
+                      "<h3 class='modal-title'>" + locale.video.insert + "</h3>" +
+                    "</div>" +
+                    "<div class='modal-body'>" +
+                      "<input value='http://' class='bootstrap-wysihtml5-insert-video-url form-control input-lg'>" +
+                    "</div>" +
+                    "<div class='modal-footer'>" +
+                      "<a href='#' class='btn btn-default ' data-dismiss='modal'>" + locale.video.cancel + "</a>" +
+                      "<a href='#' class='btn btn-primary' data-dismiss='modal'>" + locale.video.insert + "</a>" +
+                    "</div>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+              "<a class='btn btn-default " + size + "' data-wysihtml5-command='insertvideo' title='" + locale.video.insert + "' tabindex='-1'><i class='glyphicon glyphicon-picture'></i></a>" +
+            "</li>";
+        },
+
         "html": function(locale, options) {
             var size = (options && options.size) ? ' btn-'+options.size : '';
             return "<li>" +
@@ -200,6 +224,10 @@
                         this.initInsertImage(toolbar);
                     }
 
+                    if(key === "video") {
+                        this.initInsertVideo(toolbar);
+                    }
+
                     if(key == "customCommand") {
                         this.initCustomCommand(toolbar, options.customCommandCallback);
                     }
@@ -280,6 +308,60 @@
                     caretBookmark = self.editor.composer.selection.getBookmark();
                     insertImageModal.appendTo('body').modal('show');
                     insertImageModal.on('click.dismiss.modal', '[data-dismiss="modal"]', function(e) {
+                        e.stopPropagation();
+                    });
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+        },
+
+        initInsertVideo: function(toolbar) {
+            var self = this;
+            var insertVideoModal = toolbar.find('.bootstrap-wysihtml5-insert-video-modal');
+            var urlInput = insertVideoModal.find('.bootstrap-wysihtml5-insert-video-url');
+            var insertButton = insertVideoModal.find('a.btn-primary');
+            var initialValue = urlInput.val();
+            var caretBookmark;
+
+            var insertVideo = function() {
+                var url = urlInput.val();
+                urlInput.val(initialValue);
+                self.editor.currentView.element.focus();
+                if (caretBookmark) {
+                  self.editor.composer.selection.setBookmark(caretBookmark);
+                  caretBookmark = null;
+                }
+                self.editor.composer.commands.exec("insertVideo", url);
+            };
+
+            urlInput.keypress(function(e) {
+                if(e.which == 13) {
+                    insertVideo();
+                    insertVideoModal.modal('hide');
+                }
+            });
+
+            insertButton.click(insertVideo);
+
+            insertVideoModal.on('shown', function() {
+                urlInput.focus();
+            });
+
+            insertVideoModal.on('hide', function() {
+                self.editor.currentView.element.focus();
+            });
+
+            toolbar.find('a[data-wysihtml5-command=insertVideo]').click(function() {
+                var activeButton = $(this).hasClass("wysihtml5-command-active");
+
+                if (!activeButton) {
+                    self.editor.currentView.element.focus(false);
+                    caretBookmark = self.editor.composer.selection.getBookmark();
+                    insertVideoModal.appendTo('body').modal('show');
+                    insertVideoModal.on('click.dismiss.modal', '[data-dismiss="modal"]', function(e) {
                         e.stopPropagation();
                     });
                     return false;
@@ -410,8 +492,9 @@
         "color": false,
         "emphasis": true,
         "lists": true,
-        "html": false,
+        "html": true,
         "link": true,
+        "video": true,
         "image": true,
         customCommand: false,
         events: {},
@@ -505,6 +588,10 @@
             },
             image: {
                 insert: "Insert image",
+                cancel: "Cancel"
+            },
+            video: {
+                insert: "Insert video",
                 cancel: "Cancel"
             },
             html: {

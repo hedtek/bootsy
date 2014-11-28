@@ -7321,6 +7321,88 @@ wysihtml5.commands.bold = {
   }
 };
 (function(wysihtml5) {
+  var NODE_NAME = "IFRAME";
+  wysihtml5.commands.insertVideo = {
+    exec: function(composer, command, value) {
+      value = typeof(value) === "object" ? value : { href: value }
+      //TODO still need to make sure value is sensible for the video
+      //
+      // 1. Make sure value is a url
+      // 2. Make sure it's a known domain (youtube or vimeo)
+      // 3. Make sure protocol is sane or not-specified (http, https or //)
+      // 4. Add extra iframe attributes, including sandbox, width, height, etc.
+      //
+      var doc = composer.doc,
+          video = this.state(composer),
+          textNode,
+          i,
+          parent;
+      if (video) {
+        // Video already selected, set the caret before it and delete it
+        composer.selection.setBefore(video);
+        parent = video.parentNode;
+        parent.removeChild(video);
+
+        wysihtml5.quirks.redraw(composer.element);
+        return;
+      }
+
+      video = doc.createElement(NODE_NAME);
+
+      for (i in value) {
+        if (i === "className") {
+          i = "class";
+        }
+        video.setAttribute(i, value[i]);
+      }
+
+      composer.selection.insertNode(video);
+      composer.selection.setAfter(video);
+    },
+
+    state: function(composer) {
+      var doc = composer.doc,
+          selectedNode,
+          text,
+          videosInSelection;
+
+      if (!wysihtml5.dom.hasElementWithTagName(doc, NODE_NAME)) {
+        return false;
+      }
+
+      selectedNode = composer.selection.getSelectedNode();
+      if (!selectedNode) {
+        return false;
+      }
+
+      if (selectedNode.nodeName === NODE_NAME) {
+        // This works perfectly in IE
+        return selectedNode;
+      }
+
+      if (selectedNode.nodeType !== wysihtml5.ELEMENT_NODE) {
+        return false;
+      }
+
+      text = composer.selection.getText();
+      text = wysihtml5.lang.string(text).trim();
+      if (text) {
+        return false;
+      }
+
+      videosInSelection = composer.selection.getNodes(wysihtml5.ELEMENT_NODE, function(node) {
+        return node.nodeName === "IFRAME";
+      });
+
+      if (videosInSelection.length !== 1) {
+        return false;
+      }
+
+      return videosInSelection[0];
+    }
+  }
+})(wysihtml5);
+(function(wysihtml5) {
   var NODE_NAME = "IMG";
 
   wysihtml5.commands.insertImage = {
