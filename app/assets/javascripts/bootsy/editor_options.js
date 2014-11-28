@@ -74,8 +74,12 @@ window.Bootsy.options = {
       "code": 1,
       "pre": 1,
       "iframe": {
+        set_attributes: {
+          "frameborder": "0",
+          "allowfullscreen": true
+        },
         check_attributes: {
-          src: "url",
+          src: "href",
           width: "numbers",
           height: "numbers"
         }
